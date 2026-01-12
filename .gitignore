@@ -6,7 +6,7 @@
 /.idea/**
 
 # VS Code
-/.vscode/**
+#/.vscode/**
 
 # MacOS Finder settings
 **/.DS_Store
