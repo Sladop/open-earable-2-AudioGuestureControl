@@ -1,3 +1,20 @@
+"""
+processing_utils.py
+
+Utility functions for decoding sensor data and checking sync.
+
+The module provides functions for working with raw sensor data bytes,
+including convertion to numerical types and checks if multiple sensor inputs are timestamp-synchronized. These utilities are designed
+
+Classes:
+    SensorData: Represents a single sensor sample with raw bytes and timestamp.
+    ParseType: Enum for the supported sensor data types.
+
+Functions:
+    decode_sensor_data(sample, parse_type): Decodes raw sensor bytes to int/float.
+    check_timestamp_sync(inputs, in_ports, threshold_us): Checks timestamp synchronization.
+"""
+
 import struct
 
 from enum import Enum
