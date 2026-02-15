@@ -1,6 +1,6 @@
 from sensor_processing_stage import SensorProcessingStage
-from parse_type import ParseType
-from processing_utils import decode_sensor_data, check_timestamp_sync
+from processing_utils import decode_sensor_data, check_timestamp_sync, ParseType
+
 import struct
 
 class AddingStage(SensorProcessingStage):
