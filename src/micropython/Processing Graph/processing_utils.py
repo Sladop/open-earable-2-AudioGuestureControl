@@ -19,6 +19,12 @@ import struct
 
 from enum import Enum
 
+class StageProcessingError(Exception):
+    """
+    Raised by a processing stage when it cannot produce output.
+    """
+    pass
+
 class ParseType(Enum):
     UINT8 = 1
     INT8 = 2
