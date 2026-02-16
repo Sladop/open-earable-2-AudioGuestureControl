@@ -1,14 +1,23 @@
+"""
+Event driven sensor processing pipeline.
+
+Sensor samples are injected into source nodes and automatically
+propagated through connected processing stages.
+"""
+
 from collections import deque
 from sensor_processing_stage import SensorProcessingStage
 from sensor_source_stage import SensorSourceStage
 
 class Edge:
+    """Connection from one node to another input port."""
     def __init__(self, src, dst, dst_port):
         self.src = src
         self.dst = dst
         self.dst_port = dst_port
 
 class PipelineNode:
+    """Internal wrapper storing stage, connections, and last output."""
     def __init__(self, name: str, stage: SensorProcessingStage):
         self.name = name
         self.stage = stage
@@ -18,23 +27,28 @@ class PipelineNode:
         self.has_output = False
 
 class ProcessingPipeline:
+    """Manages stages, connections, and execution flow."""
     def __init__(self):
         self.stages = []
         self.source_map = {}  # sensorID - list of node indces
 
     def add_source(self, name: str, source: SensorSourceStage):
+        """Add a sensor source node."""
         idx = len(self.stages)
         self.stages.append(PipelineNode(name, source))
         self.source_map.setdefault(source.get_sensor_id(), []).append(idx)
 
     def add_stage(self, name: str, stage: SensorProcessingStage):
+        """Add a processing stage node."""
         self.stages.append(PipelineNode(name, stage))
 
     def connect(self, src, dst, dst_port=0):
+        """Connect two nodes by index."""
         self.stages[dst].inputs.append(Edge(src, dst, dst_port))
         self.stages[src].outputs.append(Edge(src, dst, dst_port))
 
     def connect_by_name(self, src_name, dst_name, dst_port=0):
+        """Connect two nodes by name."""
         src_idx = dst_idx = None
         for i, node in enumerate(self.stages):
             if node.name == src_name:
@@ -46,6 +60,7 @@ class ProcessingPipeline:
         self.connect(src_idx, dst_idx, dst_port)
 
     def inject(self, sample):
+        """Inject a sensor sample and trigger execution."""
         sensor_id = sample['id']
         if sensor_id not in self.source_map:
             return -1
@@ -57,6 +72,7 @@ class ProcessingPipeline:
             self.run_from(src_idx)
 
     def run_from(self, start_idx):
+        """Execute downstream nodes starting from given node."""
         queue = deque()
         queue.extend(e.dst for e in self.stages[start_idx].outputs)
 
@@ -91,4 +107,5 @@ class ProcessingPipeline:
             queue.extend(e.dst for e in node.outputs)
 
     def get_output(self, node_index):
+        """Return last output of a node."""
         return self.stages[node_index].output
